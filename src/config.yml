@@ -1,0 +1,51 @@
+############################################################
+# +======================================================+ #
+# |                  Plugin Information                  | #
+# +======================================================+ #
+############################################################
+
+# Information:
+# Author: DavidIsOut/Snapje
+# Version: Developer
+# if you found an error please e-mail: davidoutdeveloper@gmail.com
+
+############################################################
+# +======================================================+ #
+# |                     Plugin Config                    | #
+# +======================================================+ #
+############################################################
+
+Prefix: '&b&lCaneTop'
+
+Command-Help:
+  - "&9&m---------------------------------------------------"
+  - "                       &3&lHelp                        "
+  - "&b/canetop score get [player]: &fget a players canescore."
+  - "&b/canetop score set [player] [canes]: &fset a players canescore."
+  - "&b/canetop score add [player] [canes]: &fadd canes to someones canescore."
+  - "&b/canetop score remove [player] [canes]: &fremove canes from someones canescore."
+  - "&b/canetop score reset [player]: &freset a players canescore."
+  - "&b/canetop settings reload: &freload the plugin settings."
+  - "&b/canetop settings edit: &fedit the plugin settings."
+  - "&b/canetop top: &fget the canetop."
+  - "&9&m---------------------------------------------------"
+  
+CaneTop:
+  GUI:
+    # Set this to true if you want the canetop gui.
+    enabled: true
+    # Set this to 16, 9 or 4, this will edit the pyramid size.
+    size: 16
+    title: "&b&lCaneTop"
+    displayName: "&3{PLACE} &b{PLAYER}"
+    lore:
+      - "&ffarmed {SCORE} canes."
+  Message:
+    - "&9&m---------------------------------------------------"
+    - "                     &b&lCaneTop                       "
+    - "&3{PLACE}) &b {PLAYER}&f: {SCORE} canes."
+    - "&9&m---------------------------------------------------"
+
+
+
+

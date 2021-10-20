@@ -1,0 +1,21 @@
+name: CaneTop
+main: snapje.canetop.Core.Main
+version: 1.0
+author: Snapje
+api-version: 1.13
+website: www.spigotmc.org/resources/canetop.79270
+description: This plugin counts how mutch sugger cane you broke.
+softdepend: [WildTools]
+commands:
+  Canetop:
+    description: Get the canetop 10.
+
+
+permissions:
+  CaneTop.*:
+    default: op
+    children:
+      - canetop.manage
+  Canetop.manage:
+    default: op
+     
