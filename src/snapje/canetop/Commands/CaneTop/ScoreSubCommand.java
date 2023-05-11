@@ -104,9 +104,18 @@ public class ScoreSubCommand extends SubCommand {
           OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
           CaneScore score = CaneScore.getScore(player.getUniqueId());;
           int number = Integer.parseInt(args[3]);
-          if(!sender.hasPermission("canetop.manage")) sender.sendMessage(Messages.getInstance().noPermission);
-          if (isLegit(player) == false) sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
-          if(!Check.isInteger(args[3])) sender.sendMessage(Messages.getInstance().isNotANumber.replace("{NUMBER}", args[3]));
+          if(!sender.hasPermission("canetop.manage")) {
+              sender.sendMessage(Messages.getInstance().noPermission);
+              return;
+          }
+          if (isLegit(player) == false) {
+              sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
+              return;
+          }
+          if(!Check.isInteger(args[3])) {
+              sender.sendMessage(Messages.getInstance().isNotANumber.replace("{NUMBER}", args[3]));
+              return;
+          }
 
 
               if(args[1].equalsIgnoreCase("set")) {

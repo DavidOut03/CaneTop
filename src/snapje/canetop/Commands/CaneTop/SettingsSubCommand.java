@@ -48,10 +48,10 @@ public class SettingsSubCommand extends SubCommand {
         if(args.length == 1) {
             sendHelp(sender);
         } else if(args.length == 2) {
-            if(args[1].equalsIgnoreCase("reload")) {
+            if(args[1].equalsIgnoreCase("reload") && sender.hasPermission("canetop.manage")) {
                 Main.getInstance().update();
                 sender.sendMessage(Messages.getInstance().reloadedConfig);
-            } else if(args[1].equalsIgnoreCase("edit") && sender instanceof Player) {
+            } else if(args[1].equalsIgnoreCase("edit") && sender instanceof Player && sender.hasPermission("canetop.manage")) {
                 GUI_Settings gui = new GUI_Settings();
                 gui.openGUI((Player) sender);
             }
