@@ -60,50 +60,70 @@ public class ScoreSubCommand extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
       if(args.length == 1) {
-          if(sender instanceof Player) {
+
+          if(!(sender instanceof Player)) {
+              sendHelp(sender);
+              return;
+          }
               Player p = (Player) sender;
               CaneScore score = CaneScore.getScore(p.getUniqueId());;
               sender.sendMessage(Messages.getInstance().getYourScore.replace("{PLAYER}", p.getName()).replace("{SCORE}", score.getScore() + ""));
-          } else {
-              sendHelp(sender);
+          return;
+      }
+
+      if(args.length == 2) {
+          if(!args[1].equalsIgnoreCase("get") || !(sender instanceof Player)) {
+                sendHelp(sender);
+                return;
           }
-      } else if(args.length == 2) {
-          if(args[1].equalsIgnoreCase("get") && sender instanceof Player) {
+
               Player p = (Player) sender;
               CaneScore score = CaneScore.getScore(p.getUniqueId());;
               sender.sendMessage(Messages.getInstance().getYourScore.replace("{PLAYER}", p.getName()).replace("{SCORE}", score.getScore() + ""));
-          } else {
-              sendHelp(sender);
-          }
+              return;
       }
 
       if(args.length == 3) {
           String playerName = args[2];
           OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-          CaneScore score = CaneScore.getScore(player.getUniqueId());;
+          CaneScore score = CaneScore.getScore(player.getUniqueId());
+
           if (args[1].equalsIgnoreCase("get")) {
-
-              if (!sender.hasPermission("canetop.manage")) sender.sendMessage(Messages.getInstance().noPermission);
-                  if (isLegit(player) == false) sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
-
+              if (!sender.hasPermission("canetop.manage")) {
+                  sender.sendMessage(Messages.getInstance().noPermission);
+                  return;
+              }
+              if (!isLegit(player)) {
+                      sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
+                      return;
+              }
                   sender.sendMessage(Messages.getInstance().getPlayerScore.replace("{PLAYER}", player.getName()).replace("{SCORE}", score.getScore(getUUID(playerName)).getScore() + ""));
-          } else if (args[1].equalsIgnoreCase("reset")) {
-              if (!sender.hasPermission("canetop.manage"))  sender.sendMessage(Messages.getInstance().noPermission);
-
-                  if (isLegit(player) == false)sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
-                  sender.sendMessage(Messages.getInstance().resetPlayerScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()));
-                  score.reset();
-
-          } else {
-              sendHelp(sender);
+                  return;
           }
 
+           if (args[1].equalsIgnoreCase("reset")) {
+              if (!sender.hasPermission("canetop.manage"))  {
+                  sender.sendMessage(Messages.getInstance().noPermission);
+                  return;
+              }
+              if (!isLegit(player)) {
+                      sender.sendMessage(Messages.getInstance().playerNotFound.replace("{PLAYER}", playerName));
+                      return;
+              }
+                  sender.sendMessage(Messages.getInstance().resetPlayerScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()));
+                  score.reset();
+          }
+           sendHelp(sender);
+           return;
+      }
 
-      } else if(args.length == 4) {
+
+      if(args.length == 4) {
           String playerName = args[2];
           OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
           CaneScore score = CaneScore.getScore(player.getUniqueId());;
           int number = Integer.parseInt(args[3]);
+
           if(!sender.hasPermission("canetop.manage")) {
               sender.sendMessage(Messages.getInstance().noPermission);
               return;
@@ -119,37 +139,42 @@ public class ScoreSubCommand extends SubCommand {
 
 
               if(args[1].equalsIgnoreCase("set")) {
-                  if(number < 0) sender.sendMessage(Messages.getInstance().scoreCannotBeUnderZero.replace("{PLAYER}", playerName).replace("{POINT}", number + ""));
+                  if(number < 0) {
+                      sender.sendMessage(Messages.getInstance().scoreCannotBeUnderZero.replace("{PLAYER}", playerName).replace("{POINT}", number + ""));
+                      return;
+                  }
                   score.set(number);
                   sender.sendMessage(Messages.getInstance().setPlayerScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()).replace("{CANES}", number + ""));
-              } else if(args[1].equalsIgnoreCase("add")) {
+                  return;
+              }
+              if(args[1].equalsIgnoreCase("add")) {
                   score.add(number);
                   sender.sendMessage(Messages.getInstance().addCanesToScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()).replace("{CANES}",  number + ""));
-              } else if(args[1].equalsIgnoreCase("remove")) {
-                  if(number > score.getScore()) sender.sendMessage(Messages.getInstance().scoreCannotBeUnderZero.replace("{PLAYER}", playerName).replace("{POINT}", number + ""));
-                  score.remove(number);
-                  sender.sendMessage(Messages.getInstance().removeCanesFromScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()).replace("{CANES}",  number + ""));
-              } else {
-                  sendHelp(sender);
+                  return;
               }
 
-      } else {
-          sendHelp(sender);
+              if(args[1].equalsIgnoreCase("remove")) {
+                  if(number > score.getScore()) {
+                      sender.sendMessage(Messages.getInstance().scoreCannotBeUnderZero.replace("{PLAYER}", playerName).replace("{POINT}", number + ""));
+                      return;
+                  }
+                  score.remove(number);
+                  sender.sendMessage(Messages.getInstance().removeCanesFromScore.replace("{PLAYER}", Bukkit.getOfflinePlayer(getUUID(playerName)).getName()).replace("{CANES}",  number + ""));
+                  return;
+              }
+
+
+            sendHelp(sender);
+              return;
       }
+
+      sendHelp(sender);
     }
 
     public UUID getUUID(String name) {
         Player p = Bukkit.getPlayer(name);
         OfflinePlayer op = Bukkit.getOfflinePlayer(name);
-        UUID uuid = null;
-
-        if(p != null) {
-            uuid = p.getUniqueId();
-        } else {
-            uuid = op.getUniqueId();
-        }
-
-        return  uuid;
+        return (p == null ? op.getUniqueId() : p.getUniqueId());
     }
 
     public void sendHelp(CommandSender sender) {

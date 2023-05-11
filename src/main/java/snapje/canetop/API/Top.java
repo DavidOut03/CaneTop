@@ -22,14 +22,15 @@ public class Top {
 
     int currentPosition = 1;
     for(String currentLine : Messages.getCaneTop()) {
-        if(currentLine.contains("{PLACE}") || currentLine.contains("{PLAYER}") || currentLine.contains("SCORE")) {
+        if(!currentLine.contains("{PLACE}") && !currentLine.contains("{PLAYER}") && !currentLine.contains("SCORE")) {
+            sender.sendMessage(Chat.format(currentLine));
+            continue;
+        }
+
             String id = top10.get(currentPosition);
             UUID uuid = UUID.fromString(id);
             sender.sendMessage(Chat.format(currentLine).replace("{PLACE}", currentPosition + "").replace("{PLAYER}", Bukkit.getOfflinePlayer(UUID.fromString(top10.get(currentPosition))).getName()).replace("{SCORE}", CaneScore.getScore(uuid).getScore() + ""));
             currentPosition++;
-        } else {
-            sender.sendMessage(Chat.format(currentLine));
-        }
     }
   }
 
@@ -42,9 +43,7 @@ public class Top {
 
      int current = map.size();
       for(Map.Entry<String, Integer> me : map.entrySet()) {
-          if(current <= top) {
-              returned.put(current, me.getKey());
-          }
+          if(current <= top) returned.put(current, me.getKey());
           current--;
       }
 
@@ -55,9 +54,8 @@ public class Top {
       int returned = 0;
 
       for(Map.Entry<Integer, String> top : getTop(getScores().size()).entrySet()) {
-          if(top.getValue().equalsIgnoreCase(score.getPlayerUUID().toString())) {
+          if(!top.getValue().equalsIgnoreCase(score.getPlayerUUID().toString())) continue;
               return top.getKey();
-          }
       }
 
       return returned;

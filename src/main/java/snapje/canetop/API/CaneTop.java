@@ -28,30 +28,19 @@ public class CaneTop {
 
     public void updateTop() {
         HashMap<Integer, CaneScore> newCaneTop = new HashMap();
-
-
         this.caneTop = newCaneTop;
     }
 
     public boolean spotIsEmpty(HashMap<Integer, CaneScore> map, int place) {
-        boolean is = true;
-
-        if(map.isEmpty()) {
-            if(map.get(place) != null) {
-                is = false;
-            }
-        }
-
-        return is;
+        return (map.isEmpty() && map.get(place) != null)? false : true;
     }
 
     public boolean playerAlreadyInTop(HashMap<Integer, CaneScore> top, CaneScore score) {
         boolean is = false;
 
         for(int place : caneTop.keySet()) {
-            if(caneTop.get(place).equals(score)) {
-                return true;
-            }
+            if(!caneTop.get(place).equals(score)) continue;
+               return true;
         }
 
         return is;
@@ -66,13 +55,12 @@ public class CaneTop {
     public Integer getPlace(CaneScore score) {
         int currentPlace = 1;
 
-        if(!caneTop.isEmpty()) {
-            for (int place : caneTop.keySet()) {
-                if (caneTop.get(place).equals(score)) {
-                    currentPlace = place;
-                }
-            }
+        if(caneTop.isEmpty()) return currentPlace;
+        for (int place : caneTop.keySet()) {
+            if (!caneTop.get(place).equals(score)) continue;
+            currentPlace = place;
         }
+
         return currentPlace;
     }
 
@@ -84,22 +72,19 @@ public class CaneTop {
         updateTop();
 
         for(String currentLine : Messages.getCaneTop()) {
-            if(currentLine.contains("{PLACE}") || currentLine.contains("{PLAYER}") || currentLine.contains("SCORE")) {
-                for(int place : getCaneTop().keySet()) {
-                    if(place >= starter) {
-                        if(place <= max) {
-                            CaneScore score = caneTop.get(place);
-                            if(score != null) {
-                                sender.sendMessage(Chat.format(currentLine).replace("{PLACE}", place + "").replace("{PLAYER}", Bukkit.getOfflinePlayer(score.getPlayerUUID()).getName()).replace("{SCORE}", score.getScore() + ""));
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            } else {
+
+            if(!currentLine.contains("{PLACE}") && !currentLine.contains("{PLAYER}") && !currentLine.contains("SCORE")) {
                 sender.sendMessage(Chat.format(currentLine));
+                continue;
             }
+
+                for(int place : getCaneTop().keySet()) {
+                    if(place < starter) continue;
+                    if(place > max) break;
+                    CaneScore score = caneTop.get(place);
+                    if(score == null) continue;
+                      sender.sendMessage(Chat.format(currentLine).replace("{PLACE}", place + "").replace("{PLAYER}", Bukkit.getOfflinePlayer(score.getPlayerUUID()).getName()).replace("{SCORE}", score.getScore() + ""));
+                }
         }
     }
 

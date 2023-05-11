@@ -47,14 +47,25 @@ public class SettingsSubCommand extends SubCommand {
     public void onCommand(CommandSender sender, String[] args) {
         if(args.length == 1) {
             sendHelp(sender);
-        } else if(args.length == 2) {
-            if(args[1].equalsIgnoreCase("reload") && sender.hasPermission("canetop.manage")) {
+            return;
+        }
+
+        if(!sender.hasPermission("canetop.manage")) {
+            sender.sendMessage(Messages.getInstance().noPermission);
+            return;
+        }
+
+
+        if(args[1].equalsIgnoreCase("reload")) {
                 Main.getInstance().update();
                 sender.sendMessage(Messages.getInstance().reloadedConfig);
-            } else if(args[1].equalsIgnoreCase("edit") && sender instanceof Player && sender.hasPermission("canetop.manage")) {
+                return;
+        }
+
+        if(args[1].equalsIgnoreCase("edit") && sender instanceof Player) {
                 GUI_Settings gui = new GUI_Settings();
                 gui.openGUI((Player) sender);
-            }
+                return;
         }
     }
 

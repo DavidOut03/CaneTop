@@ -39,16 +39,12 @@ public class TopSubCommand extends SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-        if(sender instanceof Player) {
-            if(Settings.getInstance().caneTopGuiEnabled() == true) {
-                GUI_CaneTop gui = new GUI_CaneTop();
-                gui.openGUI((Player) sender);
-            } else {
-                Top.sendTop10(sender);
-            }
-        } else {
+        if(!(sender instanceof Player) || !Settings.getInstance().caneTopGuiEnabled()) {
             Top.sendTop10(sender);
+            return;
         }
+        GUI_CaneTop gui = new GUI_CaneTop();
+        gui.openGUI((Player) sender);
     }
 
 /**

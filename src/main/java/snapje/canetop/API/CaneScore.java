@@ -25,19 +25,20 @@ public class CaneScore {
   private int place;
 
   public CaneScore(UUID uuid, int score) {
-      if(uuid != null) {
-          if (!scores.containsKey(uuid.toString())) {
-              this.playerName = Bukkit.getOfflinePlayer(uuid).getName();
-              this.uuid = uuid.toString();
-              this.brokenCanes = score;
-              scores.put(uuid.toString(), this);
-          } else {
-              this.playerName = Bukkit.getOfflinePlayer(uuid).getName();
-              this.uuid = uuid.toString();
-              this.brokenCanes = scores.get(uuid.toString()).getScore();
-              scores.put(uuid.toString(), this);
-          }
+      if(uuid == null) return;
+
+      if (!scores.containsKey(uuid.toString())) {
+          this.playerName = Bukkit.getOfflinePlayer(uuid).getName();
+          this.uuid = uuid.toString();
+          this.brokenCanes = score;
+          scores.put(uuid.toString(), this);
+          return;
       }
+            this.playerName = Bukkit.getOfflinePlayer(uuid).getName();
+            this.uuid = uuid.toString();
+            this.brokenCanes = scores.get(uuid.toString()).getScore();
+            scores.put(uuid.toString(), this);
+
   }
 
   public String getPlayerName() {return this.playerName;}
@@ -54,21 +55,17 @@ public class CaneScore {
   }
 
   public boolean saveToConfig() {
-      boolean saved = false;
-
-      if(DataHandler.getInstance().getPlayerDataFile().exists()) {
+      if(!DataHandler.getInstance().getPlayerDataFile().exists()) return false;
           YamlConfiguration config = YamlConfiguration.loadConfiguration(DataHandler.getInstance().getPlayerDataFile());
           try {
               config.set("Player." + uuid + ".playerName", playerName);
               config.set("Player." + uuid + ".score", brokenCanes);
               config.save(DataHandler.getInstance().getPlayerDataFile());
-              saved = true;
+              return true;
           } catch (Exception ex) {
               Bukkit.getConsoleSender().sendMessage(Chat.format("&cCould not save file, Exception: " + ex));
-          }
+              return false;
       }
-
-      return saved;
   }
 
     /*
@@ -76,28 +73,19 @@ public class CaneScore {
      */
 
     public static CaneScore getScore(UUID uuid) {
-        if(scores.get(uuid.toString()) != null) {
-            return scores.get(uuid.toString());
-        } else {
-            return new CaneScore(uuid, 0);
-        }
+        if(scores.get(uuid.toString()) == null) return new CaneScore(uuid, 0);
+        return scores.get(uuid.toString());
     }
 
     public static CaneScore loadScoreFromConfig(UUID uuid) {
         CaneScore score = new CaneScore(uuid, 0);
-
         YamlConfiguration config = YamlConfiguration.loadConfiguration(DataHandler.getInstance().getPlayerDataFile());
+        String s = config.getString("Player." + uuid.toString() + ".score");
 
-        if(DataHandler.getInstance().getPlayerDataFile().exists()) {
-            if(config.getConfigurationSection("Player").contains(uuid.toString())) {
-                String s = config.getString("Player." + uuid.toString() + ".score");
-                if(s != null && Check.isInteger(s) == true) {
-                    int canes = Integer.parseInt(s);
-                    score.set(canes);
-                }
-            }
-        }
-
+        if(!DataHandler.getInstance().getPlayerDataFile().exists() || !config.getConfigurationSection("Player").contains(uuid.toString())) return score;
+        if(s == null || !Check.isInteger(s)) return score;
+            int canes = Integer.parseInt(s);
+            score.set(canes);
         return score;
     }
 

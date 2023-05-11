@@ -33,13 +33,15 @@ public class CommandManager implements CommandExecutor {
     }
 
     public void setUp() {
-        if(!commands.isEmpty()) {
+        if(commands.isEmpty()) return;
+
             for(Command cmd : commands) {
-                if(cmd.getCommandName() != null) {
+                if(cmd.getCommandName() == null) continue;
+
                     try {
                         plugin.getCommand(cmd.getCommandName()).setExecutor(this);
-                        if(cmd.getAliases() != null) {plugin.getCommand(cmd.getCommandName()).setAliases(cmd.getAliases());}
-                        if(cmd.getDescription() != null) {plugin.getCommand(cmd.getCommandName()).setDescription(cmd.getDescription());}
+                        if(cmd.getAliases() != null) plugin.getCommand(cmd.getCommandName()).setAliases(cmd.getAliases());
+                        if(cmd.getDescription() != null) plugin.getCommand(cmd.getCommandName()).setDescription(cmd.getDescription());
                         // if(cmd.getUsage() != null) { plugin.getCommand(cmd.getCommandName()).setUsage(cmd.getUsage());}
                     } catch (NullPointerException ex) {
                         Bukkit.getConsoleSender().sendMessage(Messages.getInstance().failedToRegisterCommand.replace("{COMMAND}", cmd.getCommandName()).replace("{EXCEPTION}", "Command is not in plugin.yml.") );
@@ -47,18 +49,15 @@ public class CommandManager implements CommandExecutor {
                         Bukkit.getConsoleSender().sendMessage(Messages.getInstance().failedToRegisterCommand.replace("{COMMAND}", cmd.getCommandName()).replace("{EXCEPTION}", ex.toString()) );
                     }
 
-                }
             }
-        }
-
     }
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String s, String[] args) {
 
         for(Command cmd : commands) {
-            if (cmd.getCommandName() != null) {
-                if (command.getName().equalsIgnoreCase(cmd.getCommandName())) {
+            if (cmd.getCommandName() == null || !command.getName().equalsIgnoreCase(cmd.getCommandName())) continue;
+
                     if (args.length == 0) {
                         cmd.onCommand(sender, args);
                         return false;
@@ -83,8 +82,8 @@ public class CommandManager implements CommandExecutor {
                         ex.printStackTrace();
                         return true;
                     }
-                }
-            }
+
+
         }
         return false;
     }
@@ -97,21 +96,18 @@ public class CommandManager implements CommandExecutor {
         while (commands.hasNext()) {
             SubCommand sc = (SubCommand) commands.next();
 
-            if (sc.getCommandName() != null) {
-                if (sc.getCommandName().equalsIgnoreCase(name)) {
-                    return sc;
-                }
+            if (sc.getCommandName() == null) continue;
+                if (sc.getCommandName().equalsIgnoreCase(name))   return sc;
 
                 String[] aliases;
                 int length = (aliases = sc.getAliases()).length;
                 for (int var = 0; var < length; var++) {
                     String alias = aliases[var];
-                    if (name.equalsIgnoreCase(alias)) {
-                        return sc;
-                    }
+                    if (!name.equalsIgnoreCase(alias)) continue;
+                    return sc;
                 }
-            }
         }
+
         return null;
     }
 

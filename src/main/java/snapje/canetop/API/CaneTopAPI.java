@@ -17,36 +17,28 @@ public class CaneTopAPI {
 	public static HashMap<Integer, String> caneTop = new HashMap<>();
 
 	public Integer getScore(UUID uuid) {
-		if(caneScore.containsKey(uuid.toString())) {
-		return caneScore.get(uuid.toString());
-		} else {
-			return 0;
-		}
+		return (caneScore.containsKey(uuid.toString()) ? caneScore.get(uuid.toString()) : 0);
 	}
 	public void setScore(UUID uuid, int score) {caneScore.put(uuid.toString(), score);}
 
 	public void add(UUID uuid, int score) {
-		if(caneScore.containsKey(uuid.toString())) {
-		int newScore = caneScore.get(uuid.toString()) + score;
-		caneScore.put(uuid.toString(), newScore);
-		} else {
+		if(!caneScore.containsKey(uuid.toString())) {
 			caneScore.put(uuid.toString(), score);
+			return;
 		}
+			int newScore = caneScore.get(uuid.toString()) + score;
+			caneScore.put(uuid.toString(), newScore);
 	}
 
 	public void remove(UUID uuid, int score) {
-		if(caneScore.containsKey(uuid.toString())) {
-			if(!(score > caneScore.get(uuid.toString()))) {
+		if(!caneScore.containsKey(uuid.toString()) || score > caneScore.get(uuid.toString())) {
+			caneScore.put(uuid.toString(), 0);
+			return;
+		}
 			int newScore = caneScore.get(uuid.toString()) - score;
 			caneScore.put(uuid.toString(), newScore);
-			} else {
-				caneScore.put(uuid.toString(), 0);
-			}
-			} else {
-				caneScore.put(uuid.toString(), 0);
-			}
-		
 	}
+
 	public void reset(UUID uuid) {
 		caneScore.put(uuid.toString(), 0);
 	}
@@ -54,13 +46,14 @@ public class CaneTopAPI {
 	public static Player getNumberOne() {
 		int highestvalue = 0;
 		Player numberone = null;
+
 		for(String uuid : caneScore.keySet()) {
-			if(caneScore.get(uuid) > highestvalue) {
+			if(caneScore.get(uuid) <= highestvalue) continue;
 				highestvalue = caneScore.get(uuid);
 				Player winner = Bukkit.getPlayer(uuid);
-				numberone = winner; 
-			}
+				numberone = winner;
 		}
+
 		return numberone;
 	}
 
@@ -69,22 +62,17 @@ public class CaneTopAPI {
 
 		for(String uuid : caneScore.keySet()) {
 			for(int place = 1; place < caneScore.size(); place++) {
-				if(caneScore.get(caneTop.get(place)) != null) {
-					if(caneScore.get(caneTop.get(place)) < caneScore.get(UUID.fromString(uuid))) {
-						caneTop.put(place, UUID.fromString(uuid));
-						break;
-					}
-				} else {
+				if(caneScore.get(caneTop.get(place)) == null) {
 					caneTop.put(place, UUID.fromString(uuid));
 					break;
 				}
+
+				if(caneScore.get(caneTop.get(place)) > caneScore.get(UUID.fromString(uuid))) continue;
+					caneTop.put(place, UUID.fromString(uuid));
+					break;
 			}
 		}
 		return caneTop;
-	}
-
-	public void findPlaceForPlayer(UUID uuid) {
-
 	}
 
 	public static HashMap<Integer, UUID> getTop10() {
@@ -144,10 +132,9 @@ public class CaneTopAPI {
 		for(int place = 1; place < caneScore.size(); place++) {
 			UUID holder = top.get(place);
 			for(String currentuuid : caneScore.keySet()) {
-			if(caneScore.get(uuid.toString()) > caneScore.get(holder.toString())) {
+				if(caneScore.get(uuid.toString()) < caneScore.get(holder.toString())) continue;
 				UUID cu = UUID.fromString(currentuuid);
 				top.put(place, cu);
-			}
 			}
 		}
 		
@@ -161,7 +148,7 @@ public class CaneTopAPI {
 	public static YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerdata);
 	
 	public static void saveToDatabase(UUID uuid) {
-		if(caneScore.get(uuid.toString()) != null) { 
+		if(caneScore.get(uuid.toString()) == null) return;
 		try {
 			
 			OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
@@ -173,7 +160,7 @@ public class CaneTopAPI {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		}
+
 	}
 	public static void getFromDatabase(UUID uuid) {
 			if(uuid != null) {
@@ -195,20 +182,13 @@ public class CaneTopAPI {
 	public static HashMap<String, Integer> getAllScores() {
 		HashMap<String, Integer> CaneScore = caneScore;
 		
-		if(playerdata.exists()) {
-			if(yaml.getConfigurationSection("Player") != null) {
+		if(!playerdata.exists() || yaml.getConfigurationSection("Player") == null) return CaneScore;
 				for(String uuid : yaml.getConfigurationSection("Player").getKeys(false)) {
-					
 					String score = yaml.getString("Player." + uuid + ".caneScore");
-					if(isInteger(score) == true) {
+					if(!isInteger(score) ) continue;
 					int finalScore = Integer.parseInt(score);
 					CaneScore.put(UUID.fromString(uuid).toString(), finalScore);
-					}
 				}
-			}
-		}
-		
-		
 		return CaneScore;
 	}
 	

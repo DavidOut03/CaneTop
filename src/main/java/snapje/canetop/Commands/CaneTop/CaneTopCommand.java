@@ -77,20 +77,23 @@ public class CaneTopCommand extends Command {
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {
-            if(sender instanceof Player) {
-                if(sender.hasPermission("canetop.manage")) {
-                    sendHelp(sender);
-                } else {
-                    if(Settings.getInstance().caneTopGuiEnabled() == true) {
-                        GUI_CaneTop gui = new GUI_CaneTop();
-                        gui.openGUI((Player) sender);
-                    } else {
-                        Top.sendTop10(sender);
-                    }
-                }
-            } else {
-                sendHelp(sender);
+        if(!(sender instanceof Player)) {
+            sendHelp(sender);
+            return;
+        }
+
+        if(!sender.hasPermission("canetop.manage")) {
+            if(!Settings.getInstance().caneTopGuiEnabled()) {
+                Top.sendTop10(sender);
+                return;
             }
+
+            GUI_CaneTop gui = new GUI_CaneTop();
+            gui.openGUI((Player) sender);
+            return;
+        }
+
+        sendHelp(sender);
     }
 
 

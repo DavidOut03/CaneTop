@@ -59,30 +59,31 @@ public abstract class GUI {
 
     protected void add(ItemStack itemStack) {
         for(int i = 0; i < getSize(); i++) {
+
             if(itemStackHashMap.get(i) == null) {
-               itemStackHashMap.put(i, itemStack);
-               break;
-            } else  if (itemStackHashMap.get(i).getType() == Material.AIR) {
                 itemStackHashMap.put(i, itemStack);
                 break;
             }
+
+            if (itemStackHashMap.get(i).getType() == Material.AIR) {
+                itemStackHashMap.put(i, itemStack);
+                break;
             }
+        }
     }
     protected void remove(int slot) {
         itemStackHashMap.remove(slot);
     }
     protected void removeItemStack(ItemStack item) {
         for(int slot : itemStackHashMap.keySet()) {
-            if(itemStackHashMap.get(slot).equals(item)) {
+            if(!itemStackHashMap.get(slot).equals(item)) continue;
                 remove(slot);
-            }
         }
     }
     protected void removeMaterial(Material mat) {
         for(int slot : itemStackHashMap.keySet()) {
-            if(itemStackHashMap.get(slot).getType().equals(mat)) {
+            if(!itemStackHashMap.get(slot).getType().equals(mat)) continue;
                 remove(slot);
-            }
         }
     }
 
@@ -95,20 +96,14 @@ public abstract class GUI {
         openGUI(player);
     }
     public void openGUI(Player player) {
-        if(itemStackHashMap.isEmpty()) {
-            setUpInventory();
-        }
+        if(itemStackHashMap.isEmpty()) setUpInventory();
         generateInventory();
         player.openInventory(inv);
     }
 
 
     public static boolean isSameGUI(Inventory inv , GUI gui) {
-        if(inv.getTitle().equals(Chat.format(gui.getTitle()))) {
-            return true;
-        } else {
-            return false;
-        }
+        return (inv.getTitle().equals(Chat.format(gui.getTitle()))) ? true : false;
     }
 
 }
